@@ -1,0 +1,121 @@
+
+CREATE DATABASE EMPLOYEE;
+USE EMPLOYEE;
+
+CREATE TABLE DEPT (
+  DEPTNO   INT PRIMARY KEY,
+  DNAME    VARCHAR(40) NOT NULL,
+  DLOC     VARCHAR(40) NOT NULL
+);
+
+CREATE TABLE EMPLOYEE (
+  EMPNO     INT PRIMARY KEY,
+  ENAME     VARCHAR(40) NOT NULL,
+  MGR_NO    INT ,
+  HIREDATE  DATE NOT NULL,
+  SAL       DECIMAL(10,2) NOT NULL,
+  DEPTNO    INT NOT NULL,
+  CONSTRAINT fk_emp_dept FOREIGN KEY (DEPTNO) REFERENCES DEPT(DEPTNO),
+  CONSTRAINT fk_emp_mgr  FOREIGN KEY (MGR_NO) REFERENCES EMPLOYEE(EMPNO)
+);
+
+CREATE TABLE PROJECT (
+  PNO   INT PRIMARY KEY,
+  PLOC  VARCHAR(40) NOT NULL,
+  PNAME VARCHAR(60) NOT NULL
+);
+
+CREATE TABLE ASSIGNED_TO (
+  EMPNO  INT NOT NULL,
+  PNO    INT NOT NULL,
+  JOB_ROLE VARCHAR(40) NOT NULL,
+  PRIMARY KEY (EMPNO, PNO),
+  CONSTRAINT fk_asg_emp FOREIGN KEY (EMPNO) REFERENCES EMPLOYEE(EMPNO),
+  CONSTRAINT fk_asg_prj FOREIGN KEY (PNO)   REFERENCES PROJECT(PNO)
+);
+
+CREATE TABLE INCENTIVES (
+  EMPNO            INT NOT NULL,
+  INCENTIVE_DATE   DATE NOT NULL,
+  INCENTIVE_AMOUNT DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (EMPNO, INCENTIVE_DATE),
+  CONSTRAINT fk_inc_emp FOREIGN KEY (EMPNO) REFERENCES EMPLOYEE(EMPNO)
+);
+
+
+INSERT INTO DEPT VALUES
+ (10, 'Sales', 'Bengaluru'),
+ (20, 'Engineering', 'Hyderabad'),
+ (30, 'HR', 'Mysuru'),
+ (40, 'Finance', 'Chennai'),
+ (50, 'Support', 'Bengaluru'),
+ (60, 'R&D', 'Pune');
+
+
+INSERT INTO EMPLOYEE VALUES
+ (1001, 'Asha',   NULL,  '2020-01-15', 75000, 20),
+ (1002, 'Bharat', 1001,  '2021-03-10', 62000, 20),
+ (1003, 'Chetan', 1001,  '2019-07-01', 68000, 10),
+ (1004, 'Divya',  1003,  '2022-11-20', 54000, 10),
+ (1005, 'Esha',   1003,  '2018-05-05', 50000, 30),
+ (1006, 'Faraz',  1001,  '2020-09-09', 59000, 50),
+ (1007, 'Gita',   1003,  '2023-02-01', 52000, 40),
+ (1008, 'Hari',   1001,  '2024-06-17', 61000, 20);
+
+
+INSERT INTO PROJECT VALUES
+ (201, 'Bengaluru',  'Nimbus'),
+ (202, 'Hyderabad',  'Saffron'),
+ (203, 'Mysuru',     'Lotus'),
+ (204, 'Chennai',    'atlas'),
+ (205, 'Pune',       'Quartz'),
+ (206, 'Bengaluru',  'Olive');
+
+INSERT INTO ASSIGNED_TO  VALUES
+ (1001, 202, 'Architect'),
+ (1002, 202, 'Backend Devloper'),
+ (1003, 201, 'Sales Lead'),
+ (1004, 201, 'Sales Executive'),
+ (1005, 203, 'HR Partner'),
+ (1006, 206, 'Support Team'),
+ (1007, 204, 'Data Analyst'),
+ (1008, 205, 'Q and A'),
+ (1002, 205, 'frontend Devloper'),
+ (1006, 201, 'Markrting Head');
+
+
+INSERT INTO INCENTIVES  VALUES
+ (1001, '2024-03-31', 12000),
+ (1002,  '2024-06-30', 8000),
+ (1003, '2024-09-30',  5000),
+ (1004, '2025-03-31',  2000),
+ (1007, '2024-12-31',  3000),
+ (1008, '2025-06-30',  4500),
+ (1006, '2024-11-10', 6000),
+ (1005, '2025-09-20', 1600);
+
+-- QUERY 3
+SELECT DISTINCT a.EMPNO
+FROM ASSIGNED_TO a
+JOIN PROJECT p ON p.PNO = a.PNO
+WHERE p.PLOC IN ('Bengaluru','Hyderabad','Mysuru');
+
+-- QUERY 4
+SELECT e.EMPNO
+FROM EMPLOYEE e
+LEFT JOIN INCENTIVES i
+  ON i.EMPNO = e.EMPNO
+WHERE i.EMPNO IS NULL;
+
+-- QUERY 5
+SELECT e.ENAME,  e.EMPNO,  e.DEPTNO,  a.JOB_ROLE,
+d.DLOC    AS dept_location,
+p.PLOC    AS project_location FROM EMPLOYEE e
+JOIN DEPT d  ON d.DEPTNO = e.DEPTNO
+JOIN ASSIGNED_TO a ON a.EMPNO  = e.EMPNO
+JOIN PROJECT p ON p.PNO    = a.PNO
+WHERE d.DLOC = p.PLOC;
+ 
+ 
+
+	
